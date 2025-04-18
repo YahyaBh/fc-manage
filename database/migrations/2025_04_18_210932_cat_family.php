@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('articles', function (Blueprint $table) {
-            $table->id('id_article'); // Custom primary key
-            $table->string('sous_f'); // Assuming it's a string (e.g. code or name)
-            $table->string('designation');
-            $table->string('unite');
-            $table->boolean('status')->default(true); // Checkbox equivalent
+        Schema::create('family', function (Blueprint $table) {
+            $table->id(); // Auto-incrementing primary key
+            $table->string('intitule');
             $table->timestamps(); // created_at and updated_at
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('articles');
+        Schema::dropIfExists('family');
     }
 };
