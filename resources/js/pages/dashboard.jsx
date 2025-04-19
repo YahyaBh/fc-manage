@@ -185,7 +185,7 @@ export default function Dashboard() {
                                             <option className="text-black" disabled value="">
                                                 Select Category
                                             </option>
-                                            {categories ? categories.map((cat) => (
+                                            {categories.length > 0 ? categories.map((cat) => (
                                                 <option className="text-black" key={cat.id} value={cat.intitule}>
                                                     {cat.intitule}
                                                 </option>
