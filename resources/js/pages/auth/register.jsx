@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
+import { toast } from 'react-hot-toast';
+
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -19,9 +21,13 @@ export default function Register() {
     const submit = (e) => {
         e.preventDefault();
         post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+            onFinish: () => {
+                reset('password', 'password_confirmation');
+                toast.success("A verification email has been sent! Please check your inbox.");
+            },
         });
     };
+
 
     return (
         <AuthLayout title="Create an account" description="Enter your details below to create your account">

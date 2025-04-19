@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('family', function (Blueprint $table) {
+        Schema::create('cat_family', function (Blueprint $table) {
             $table->id(); // Auto-incrementing primary key
             $table->string('intitule');
             $table->timestamps(); // created_at and updated_at

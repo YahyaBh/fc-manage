@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('designation');
             $table->string('unite');
             $table->boolean('status')->default(true); // Checkbox equivalent
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps(); // created_at and updated_at
         });
     }

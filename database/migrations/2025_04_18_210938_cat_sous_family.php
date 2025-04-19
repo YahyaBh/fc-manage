@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sous_family', function (Blueprint $table) {
-            $table->id(); // Auto-incrementing primary key
-            $table->foreignId('cat_id')->constrained('cat_family')->onDelete('cascade');
+        Schema::create('cat_sous_family', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('cat_id');
+            $table->foreign('cat_id')->references('id')->on('cat_family')->onDelete('cascade');
             $table->string('intitule');
-            $table->timestamps(); // created_at and updated_at
+            $table->timestamps();
         });
-    
     }
 
     /**

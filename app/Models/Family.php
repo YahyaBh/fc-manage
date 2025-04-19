@@ -2,12 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Family extends Model
 {
-    protected $fillable = [
-        'intitule',
-    ];
+    use HasFactory;
 
+    protected $table = 'cat_family';
+
+    protected $fillable = ['intitule'];
+
+    public function subfamilies()
+    {
+        return $this->hasMany(SubFamily::class, 'cat_id');
+    }
+
+    
 }
