@@ -17,6 +17,9 @@ Route::get('/login', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
+    Route::post('/article/add' , [DashboardController::class , 'addArticle'])->name('article.add');
 });
 
 

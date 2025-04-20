@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { IoIosAdd } from "react-icons/io";
+import { Switch } from '@mui/material';
 import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 
 
@@ -13,74 +17,65 @@ const breadcrumbs = [
     },
 ];
 
+dayjs.extend(relativeTime);
+
 export default function Dashboard() {
-    const { articles, categories } = usePage().props;
+    const { auth, articles, categories } = usePage().props;
 
     const [selected, setSelected] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newArticle, setNewArticle] = useState({
-        name: '',
-        price: '',
-        family: '',
-        sub_family: '',
-        qty: ''
+
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        id: '',
+        designation: '',
+        family_id: '',
+        sous_family_id: '',
+        qty: '',
+        status: 1,
+        user_id: auth.user.id,
     });
 
-
-    const moadlControl = () => {
-        isModalOpen ? setIsModalOpen(false) : setIsModalOpen(true);
-    }
+    const moadlControl = () => setIsModalOpen((v) => !v);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setNewArticle((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        setData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleCategoryChange = (e) => {
-        const category = e.target.value;
-        setNewArticle((prev) => ({
+        const family_id = e.target.value;
+        setData((prev) => ({
             ...prev,
-            family: category,
+            family_id,
+            sous_family_id: '', // reset when family changes
         }));
     };
 
     const handleSubcategoryChange = (e) => {
-        const sub_category = e.target.value;
-
-        setNewArticle((prev) => ({
-            ...prev,
-            sub_family: sub_category,
-        }));
+        const sous_family_id = e.target.value;
+        setData((prev) => ({ ...prev, sous_family_id }));
     };
-
 
     const handleAddArticle = (e) => {
         e.preventDefault();
 
-        // Post data using Inertia
-        Inertia.post('/newArticle', product, {
-            onSuccess: () => {
-                // Close modal and reset form
-                moadlControl();
-                setProduct({
-                    name: '',
-                    quantity: '',
-                    price: '',
-                    wholesalePrice: '',
-                    listPrice: '',
-                    family: '',
-                    sub_family: '',
-                });
-                toast.success('Artilce added successfully');
-            },
-            onError: (errors) => {
-                console.error('Error adding product:', errors);
-                toast.error('Failed to add article');
-            },
-        });
+        if (!data.designation || !data.family_id || !data.sous_family_id || !data.qty) {
+            toast.error('Veuillez remplir tous les champs');
+            return;
+        } else {
+            post('/article/add', {
+                data: data,
+                onSuccess: () => {
+                    moadlControl();
+                    reset();
+                    toast.success('Article ajouté avec succès');
+                },
+                onError: () => {
+                    toast.error('Échec de l\'ajout');
+                },
+            });
+        }
     };
 
     const handleSelectAll = (event) => {
@@ -107,7 +102,9 @@ export default function Dashboard() {
 
     const isSelected = (id) => selected.indexOf(id) !== -1;
 
-
+    const handleStatusChange = (newStatus) => {
+        setData((prev) => ({ ...prev, status: newStatus === true ? 1 : 0 }));
+    };
 
 
     return (
@@ -129,88 +126,62 @@ export default function Dashboard() {
                                 <form onSubmit={handleAddArticle} className="space-y-4">
                                     <input
                                         type="text"
-                                        name="name"
-                                        value={newArticle.name}
+                                        name="designation"
+                                        value={data.name}
                                         onChange={handleInputChange}
-                                        placeholder="Product Name"
+                                        placeholder="Designation"
                                         className="w-full border px-3 py-2 rounded"
                                         required
                                     />
                                     <input
                                         type="number"
-                                        name="quantity"
-                                        value={newArticle.quantity}
+                                        name="qty"
+                                        value={data.qty}
                                         onChange={handleInputChange}
                                         placeholder="Quantity"
                                         className="w-full border px-3 py-2 rounded"
                                         required
                                     />
-                                    <input
-                                        disabled
-                                        type="number"
-                                        name="price"
-                                        // value={newArticle.price}
-                                        // onChange={handleInputChange}
-                                        placeholder="Price"
-                                        className="w-full border px-3 py-2 rounded disabled:opacity-10"
-                                    />
-                                    <input
-                                        disabled
-                                        type="number"
-                                        name="wholesalePrice"
-                                        // value={newArticle.wholesalePrice}
-                                        // onChange={handleInputChange}
-                                        placeholder="Wholesale Price"
-                                        className="w-full border px-3 py-2 rounded disabled:opacity-10"
-                                    />
-                                    <input
-                                        disabled
-                                        type="number"
-                                        name="listPrice"
-                                        // value={newArticle.listPrice}
-                                        // onChange={handleInputChange}
-                                        placeholder="List Price"
-                                        className="w-full border px-3 py-2 rounded disabled:opacity-10"
-                                    />
 
+                                    {/* Category */}
                                     <div>
                                         <label className="block mb-1 text-sm font-medium text-white">Category</label>
                                         <select
-                                            name="categoryId"
-                                            className="w-full border px-3 py-2 rounded"
-                                            value={newArticle.family === '' ? 'Select Subcategory' : newArticle.family}
+                                            name="family_id"
+                                            value={data.family_id}
                                             onChange={handleCategoryChange}
+                                            className="w-full border px-3 py-2 rounded text-gray"
                                             required
                                         >
-                                            <option className="text-black" disabled value="">
+                                            <option disabled value="">
                                                 Select Category
                                             </option>
-                                            {categories.length > 0 ? categories.map((cat) => (
-                                                <option className="text-black" key={cat.id} value={cat.intitule}>
+                                            {categories.map((cat) => (
+                                                <option key={cat.id} value={cat.id} className='text-black'>
                                                     {cat.intitule}
                                                 </option>
-                                            )) : ''}
+                                            ))}
                                         </select>
                                     </div>
 
-                                    {newArticle.family && (
+                                    {/* Subcategory */}
+                                    {data.family_id && categories.find(cat => cat.id === Number(data.family_id))?.sub_families.length > 0 && (
                                         <div>
                                             <label className="block mb-1 text-sm font-medium text-white">Subcategory</label>
                                             <select
-                                                name="subcategoryId"
-                                                className="w-full border px-3 py-2 rounded"
-                                                value={newArticle.sub_family === '' ? 'Select Subcategory' : newArticle.sub_family}
+                                                name="sous_family_id"
+                                                value={data.sous_family_id}
                                                 onChange={handleSubcategoryChange}
+                                                className="w-full border px-3 py-2 rounded"
                                                 required
                                             >
-                                                <option className="text-black" disabled value="">
+                                                <option disabled value="" className='text-gray'>
                                                     Select Subcategory
                                                 </option>
-
                                                 {categories
-                                                    .find((cat) => cat.intitule === newArticle.family)
-                                                    ?.subcategories.map((sub) => (
-                                                        <option className="text-black" key={sub.id} value={sub.intitule}>
+                                                    .find((cat) => cat.id === Number(data.family_id))
+                                                    ?.sub_families.map((sub) => (
+                                                        <option key={sub.id} value={sub.id} className='text-black'>
                                                             {sub.intitule}
                                                         </option>
                                                     ))}
@@ -218,6 +189,10 @@ export default function Dashboard() {
                                         </div>
                                     )}
 
+                                    <div className="flex flex-col gap-2">
+                                        <label htmlFor="status">Status : </label>
+                                        <ToggleSwitch initialStatus={data.status} onToggle={handleStatusChange} />
+                                    </div>
 
                                     <div className="flex justify-end space-x-2 pt-4">
                                         <button
@@ -225,12 +200,9 @@ export default function Dashboard() {
                                             onClick={moadlControl}
                                             className="px-4 py-2 text-black bg-gray-200 rounded hover:bg-gray-300"
                                         >
-                                            Anuller
+                                            Annuler
                                         </button>
-                                        <button
-                                            type="submit"
-                                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                        >
+                                        <button onClick={(e) => handleAddArticle(e)} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                             Ajouter
                                         </button>
                                     </div>
@@ -262,38 +234,46 @@ export default function Dashboard() {
                                                     <input
                                                         type="checkbox"
                                                         onChange={handleSelectAll}
-                                                        checked={selected.length === articles.length && articles.length}
+                                                        checked={selected.length === articles.length && articles.length > 0}
                                                     />
                                                 </div>
                                             </th>
-                                            <th className="text-left"><div className="px-4 py-4">Product Id</div></th>
+                                            <th className="text-left"><div className="px-4 py-4">_ID</div></th>
                                             <th className="text-left"><div className="px-4 py-4">Designation</div></th>
-                                            <th className="text-left"><div className="px-4 py-4">Prix</div></th>
                                             <th className="text-left"><div className="px-4 py-4">Famille</div></th>
                                             <th className="text-left"><div className="px-4 py-4">Sous Famille</div></th>
                                             <th className="text-left"><div className="px-4 py-4">Qty</div></th>
+                                            <th className="text-left"><div className="px-4 py-4">Statu</div></th>
+                                            <th className="text-left"><div className="px-4 py-4">Date Creation</div></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {articles.map((product) => {
                                             const isItemSelected = isSelected(product.id);
                                             return (
-                                                <tr key={product.id} className={isItemSelected ? 'bg-[rgba(249,250,251,0.2)]' : ''}>
+                                                <tr key={product.id_article} className={isItemSelected ? 'bg-[rgba(249,250,251,0.2)]' : ''}>
                                                     <td>
                                                         <div className="px-4 py-4">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={isItemSelected}
-                                                                onChange={() => handleSelect(product.id)}
+                                                                onChange={() => handleSelect(product.id_article)}
                                                             />
                                                         </div>
                                                     </td>
-                                                    <td><div className="px-4 py-4 text-center">{product.id}</div></td>
-                                                    <td><div className="px-4 py-4">{product.name}</div></td>
-                                                    <td><div className="px-4 py-4">{product.price}</div></td>
-                                                    <td><div className="px-4 py-4">{product.family}</div></td>
-                                                    <td><div className="px-4 py-4">{product.sub_family}</div></td>
-                                                    <td><div className="px-4 py-4">{product.qty}</div></td>
+                                                    <td><div className="px-4 py-4 text-center">{product?.id}</div></td>
+                                                    <td><div className="px-4 py-4">{product?.designation}</div></td>
+                                                    <td><div className="px-4 py-4">{categories.find((cat) => cat.id === product?.cat_family_id)?.intitule}</div></td>
+                                                    <td><div className="px-4 py-4">{categories.find((cat) => cat.id === product?.cat_family_id)?.sub_families.find((subCat) => subCat.id === product?.cat_sous_family_id)?.intitule}</div></td>
+                                                    <td><div className="px-4 py-4">{product?.qty}</div></td>
+                                                    <td><div className="px-4 py-4">
+                                                        {product?.status === 1 ? (
+                                                            <span className="text-green-500">Active</span>
+                                                        ) : (
+                                                            <span className="text-red-500">Inactive</span>
+                                                        )}
+                                                    </div></td>
+                                                    <td><div className="px-4 py-4">{dayjs(product?.created_at).fromNow()}</div></td>
                                                 </tr>
                                             );
                                         })}
@@ -321,3 +301,27 @@ export default function Dashboard() {
         </AppLayout>
     );
 }
+
+
+const ToggleSwitch = ({ initialStatus, onToggle }) => {
+    const [checked, setChecked] = useState(initialStatus);
+
+    const handleChange = (event) => {
+        const newStatus = event.target.checked;
+        setChecked(newStatus);
+        if (onToggle) onToggle(newStatus);
+    };
+
+    return (
+        <div className={'inline-flex items-center cursor-pointer px-2 py-1 rounded-ful text-white'}>
+
+            <span className="mr-2 text-sm">{checked ? 'Enabled' : 'Disabled'}</span>
+            <Switch
+                checked={checked}
+                onChange={handleChange}
+                inputProps={{ 'aria-label': 'toggle status' }}
+                size="small"
+            />
+        </div >
+    );
+};

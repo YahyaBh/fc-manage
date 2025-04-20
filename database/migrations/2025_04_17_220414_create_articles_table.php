@@ -12,14 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('articles', function (Blueprint $table) {
-            $table->id('id_article'); // Custom primary key
-            $table->string('sous_f'); // Assuming it's a string (e.g. code or name)
+            $table->id();
             $table->string('designation');
             $table->string('unite');
-            $table->boolean('status')->default(true); // Checkbox equivalent
+            $table->foreignId('cat_family_id')->constrained('cat_family')->onDelete('cascade');
+            $table->foreignId('cat_sous_family_id')->constrained('cat_sous_family')->onDelete('cascade');
+            $table->boolean('status')->default(true);
+            $table->integer('qty');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->timestamps(); // created_at and updated_at
+            $table->timestamps();
         });
     }
 

@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cat_family', function (Blueprint $table) {
-            $table->id(); // Auto-incrementing primary key
+            $table->id();
             $table->string('intitule');
-            $table->timestamps(); // created_at and updated_at
+            $table->timestamps();
         });
     }
 
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('family');
+        Schema::dropIfExists('cat_family');
     }
 };

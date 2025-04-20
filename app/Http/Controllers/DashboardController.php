@@ -15,12 +15,28 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        $articles = $user->articles()->with('category')->get(); // eager load category
-        $categories = Family::all();
+        $articles = $user->articles()->with(['family', 'subFamily'])->get();
+        $categories = Family::with('subFamilies')->get();
 
         return Inertia::render('Dashboard', [
             'articles' => $articles,
             'categories' => $categories,
         ]);
+    }
+
+
+    public function addArticle(Request $request) {
+        $user = Auth::user();
+        $article = new Article();
+        $article->designation = $request->designation;
+        $article->cat_family_id = $request->family_id;
+        $article->cat_sous_family_id = $request->sous_family_id;
+        $article->qty = $request->qty;
+        $article->status = $request->status;
+        $article->user_id = $user->id;
+        $article->unite = 0;
+        $article->save();
+
+        Inertia::render('Dashboard');
     }
 }

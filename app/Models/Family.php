@@ -14,10 +14,8 @@ class Family extends Model
 
     protected $fillable = ['intitule'];
 
-    public function subfamilies()
+    public function subFamilies()
     {
         return $this->hasMany(SubFamily::class, 'cat_id');
     }
-
-    
 }

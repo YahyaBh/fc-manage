@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('cat_sous_family', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cat_id');
-            $table->foreign('cat_id')->references('id')->on('cat_family')->onDelete('cascade');
+            $table->foreignId('cat_id')->constrained('cat_family')->onDelete('cascade');
             $table->string('intitule');
             $table->timestamps();
         });
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sous_family');
+        Schema::dropIfExists('cat_sous_family');
     }
 };
