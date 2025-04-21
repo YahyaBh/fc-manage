@@ -44,14 +44,16 @@ class DashboardController extends Controller
 
     public function deleteArticle(Request $request)
     {
-        if (is_array($request->id)) {
-            foreach ($request->id as $id) {
+        if (is_array($request->ids)) {
+            foreach ($request->ids as $id) {
                 Article::destroy($id);
             }
+        } else if($request->ids) {
+            Article::destroy($request->ids);
         } else {
-            Article::destroy($request->id);
+            return back()->with(['message' => 'No article selected.']);
         }
 
-        return redirect()->route('dashboard')->with(['message' => 'Article(s) deleted successfully.']);
+        return back()->with(['message' => 'Article(s) deleted successfully.']);
     }
 }

@@ -4,28 +4,50 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Phone, LayoutGrid } from 'lucide-react';
-import AppLogo from './app-logo';
+import { Phone, LayoutGrid, DatabaseIcon, FileText, Box, Layers, Compass } from 'lucide-react';
+import AppLogo from './app-logo.jsx';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Articles',
+        title: 'Dashboard',
         href: '/dashboard',
         icon: LayoutGrid,
+    },
+    {
+        title: 'Donnée Référentielle',
+        href: '/',
+        icon: DatabaseIcon,
+        subItems: [
+            {
+                title: 'Articles',
+                href: '/articles',
+                icon: FileText,
+            },
+            {
+                title: 'Famille',
+                href: '/famille',
+                icon: Box,
+            },
+            {
+                title: 'Sous Famille',
+                href: '/sous-famille',
+                icon: Layers,
+            },
+            {
+                title: 'Unite',
+                href: '/unite',
+                icon: Compass,
+            },
+        ],
     },
 ];
 
 const footerNavItems: NavItem[] = [
     {
         title: 'Contact',
-        href: 'https://github.com/laravel/react-starter-kit',
+        href: 'tel:+212665665655',
         icon: Phone,
     }
-    // {
-    //     title: 'Documentation',
-    //     href: 'https://laravel.com/docs/starter-kits',
-    //     icon: BookOpen,
-    // },
 ];
 
 export function AppSidebar() {

@@ -68,6 +68,7 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+
     *,
     ::after,
     ::before,
@@ -156,4 +157,9 @@
     body {
         @apply bg-background text-foreground;
     }
+}
+
+
+button {
+    cursor: pointer;
 }

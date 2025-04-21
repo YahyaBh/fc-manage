@@ -18,15 +18,11 @@ const breadcrumbs= [
     },
 ];
 
-const ProfileForm = {
-    name: string,
-    email: string
-}
 
 export default function Profile({ mustVerifyEmail, status }) {
     const { auth } = usePage().props;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: auth.user.name,
         email: auth.user.email,
     });

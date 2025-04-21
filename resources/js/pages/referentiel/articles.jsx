@@ -18,14 +18,14 @@ const MySwal = withReactContent(Swal);
 
 const breadcrumbs = [
     {
-        title: 'Dashboard',
-        href: '/dashboard',
+        title: 'Articles',
+        href: '/articles',
     },
 ];
 
 dayjs.extend(relativeTime);
 
-export default function Dashboard() {
+export default function Articles() {
     const { auth, articles, categories } = usePage().props;
 
     const [selected, setSelected] = useState([]);
