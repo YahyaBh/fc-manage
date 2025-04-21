@@ -9,6 +9,10 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 const breadcrumbs = [
     {
@@ -77,6 +81,44 @@ export default function Dashboard() {
             });
         }
     };
+
+    const handleDeleteArticle = () => {
+        if (selected.length === 0) {
+            toast.error('Veuillez sélectionner au moins un article');
+            return;
+        } else {
+            MySwal.fire({
+                title: 'Êtes-vous sûr?',
+                text: "Vous ne pourrez pas revenir en arrière!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Oui, supprimez-le!',
+                cancelButtonText: 'Annuler',
+                background: '#1e1e1e', // dark background
+                color: '#FFF', // light yellow text
+                iconColor: '#fb2c36',
+                confirmButtonColor: '#fb2c36',
+                cancelButtonColor: '#555',
+                customClass: {
+                    popup: 'rounded-2xl shadow-xl',
+                    confirmButton: 'text-black font-semibold px-4 py-2 rounded',
+                    cancelButton: 'text-white px-4 py-2 rounded',
+                },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        router.delete('/article/delete', selected, {
+                            onSuccess: () => {
+                                toast.success('Article supprimé avec succès');
+                                setSelected([]);
+                            },
+                            onError: () =>
+                                toast.error('Échec de la suppression'),
+                        });
+
+                    }
+                });
+        }
+    }
 
     const handleSelectAll = (event) => {
         if (event.target.checked) {
@@ -219,7 +261,9 @@ export default function Dashboard() {
                                 <button className="bg-white text-black px-4 py-2 rounded-md">Categories</button>
                                 <button className="bg-white text-black px-4 py-2 rounded-md">Warehouses</button>
                                 <button className="bg-white text-black px-4 py-2 rounded-md">Add Products</button> */}
-                            {/* <button className="bg-white text-black px-4 py-2 rounded-md">Import Products</button> */}
+                            {selected.length > 0 && (
+                                <button onClick={handleDeleteArticle} className="bg-red-500 text-black px-4 py-2 rounded-md">Delete</button>
+                            )}
                             <button onClick={moadlControl} className="bg-white text-black px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer">
                                 <IoIosAdd /> Ajouter
                             </button>
@@ -251,13 +295,13 @@ export default function Dashboard() {
                                         {articles.map((product) => {
                                             const isItemSelected = isSelected(product.id);
                                             return (
-                                                <tr key={product.id_article} className={isItemSelected ? 'bg-[rgba(249,250,251,0.2)]' : ''}>
+                                                <tr key={product.id} className={isItemSelected ? 'bg-[rgba(249,250,251,0.2)]' : ''}>
                                                     <td>
                                                         <div className="px-4 py-4">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={isItemSelected}
-                                                                onChange={() => handleSelect(product.id_article)}
+                                                                onChange={() => handleSelect(product.id)}
                                                             />
                                                         </div>
                                                     </td>
@@ -273,7 +317,7 @@ export default function Dashboard() {
                                                             <span className="text-red-500">Inactive</span>
                                                         )}
                                                     </div></td>
-                                                    <td><div className="px-4 py-4">{dayjs(product?.created_at).fromNow()}</div></td>
+                                                    <td><div className="px-4 py-4">{dayjs(product?.created_at).fromNow()}<sub> ({dayjs(product?.created_at).format('YYYY-MM-DD HH:mm:ss')})</sub></div></td>
                                                 </tr>
                                             );
                                         })}

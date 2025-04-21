@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\ArticleController;
-use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Request;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,6 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     Route::post('/article/add' , [DashboardController::class , 'addArticle'])->name('article.add');
+    Route::delete('/article/delete' , [DashboardController::class , 'deleteArticle'])->name('article.delete');
 });
 
 

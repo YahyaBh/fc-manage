@@ -25,7 +25,8 @@ class DashboardController extends Controller
     }
 
 
-    public function addArticle(Request $request) {
+    public function addArticle(Request $request)
+    {
         $user = Auth::user();
         $article = new Article();
         $article->designation = $request->designation;
@@ -38,5 +39,19 @@ class DashboardController extends Controller
         $article->save();
 
         Inertia::render('Dashboard');
+    }
+
+
+    public function deleteArticle(Request $request)
+    {
+        if (is_array($request->id)) {
+            foreach ($request->id as $id) {
+                Article::destroy($id);
+            }
+        } else {
+            Article::destroy($request->id);
+        }
+
+        return redirect()->route('dashboard')->with(['message' => 'Article(s) deleted successfully.']);
     }
 }
