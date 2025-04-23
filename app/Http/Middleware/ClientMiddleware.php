@@ -9,18 +9,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ClientMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->role === 'client') {
             return $next($request);
         }
 
-        abort(403, 'Unauthorized - Client Only');
+        Auth::logout();
+
+        if ($request->expectsJson() || $request->header('X-Inertia')) {
+            return inertia()->location(route('login'));
+        }
+
+        return redirect()->route('login')->withErrors(['error' => 'Please log in again.']);
     }
 }

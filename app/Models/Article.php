@@ -24,4 +24,10 @@ class Article extends Model
     {
         return $this->belongsTo(SubFamily::class, 'cat_sous_family_id'); 
     }
+
+
+    public function unite()
+    {
+        return $this->belongsTo(Unite::class);
+    }
 }

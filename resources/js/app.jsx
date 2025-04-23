@@ -1,14 +1,15 @@
-// resources/js/app.js or app.jsx
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
+import { Inertia } from '@inertiajs/inertia';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+const appName = import.meta.env.VITE_APP_NAME || 'Application';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -29,3 +30,15 @@ createInertiaApp({
 });
 
 initializeTheme();
+
+Inertia.on('error', (error) => {
+    if (error?.status === 409) {
+        toast.error('Your session has expired. Please log in again.');
+    }
+
+    if (error?.response?.data?.message) {
+        toast.error(error.response.data.message);
+    } else {
+        toast.error('An unexpected error occurred. Please try again.');
+    }
+});

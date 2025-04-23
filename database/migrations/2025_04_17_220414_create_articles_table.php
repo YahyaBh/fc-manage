@@ -14,14 +14,19 @@ return new class extends Migration
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->string('designation');
-            $table->string('unite');
-            $table->foreignId('cat_family_id')->constrained('cat_family')->onDelete('cascade');
-            $table->foreignId('cat_sous_family_id')->constrained('cat_sous_family')->onDelete('cascade');
-            $table->boolean('status')->default(true);
-            $table->integer('qty');
+
+            $table->unsignedBigInteger('unite_id');
+            $table->unsignedBigInteger('cat_family_id');
+            $table->unsignedBigInteger('cat_sous_family_id');
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->boolean('status')->default(true);
             $table->timestamps();
+
+            $table->foreign('unite_id')->references('id')->on('unites')->onDelete('cascade');
+            $table->foreign('cat_family_id')->references('id')->on('cat_family')->onDelete('cascade');
+            $table->foreign('cat_sous_family_id')->references('id')->on('cat_sous_family')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

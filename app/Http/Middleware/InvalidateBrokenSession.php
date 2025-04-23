@@ -18,19 +18,20 @@ class InvalidateBrokenSession
     public function handle(Request $request, Closure $next): Response
     {
         try {
-            Session::getId(); // Ensure session is loaded
-            Session::all();   // Access something to trigger possible failure
+            Session::getId(); 
+            Session::all();   
         } catch (\Throwable $e) {
-            Auth::logout();      // Logout user
-            Session::flush();    // Clear session
+            Auth::logout();      
+            Session::flush();    
 
             if ($request->expectsJson() || $request->header('X-Inertia')) {
                 return inertia()->location(route('login'));
             }
 
-            return redirect()->route('login')->withErrors(['session' => 'Your session has expired. Please log in again.']);
+            return redirect()->route('login')->withErrors(['error' => 'Your session has expired. Please log in again.']);
         }
 
         return $next($request);
     }
 }
+

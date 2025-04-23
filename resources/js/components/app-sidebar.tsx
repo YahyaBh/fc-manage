@@ -15,27 +15,27 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Donnée Référentielle',
-        href: '/',
+        href: '/referentiel',
         icon: DatabaseIcon,
         subItems: [
             {
                 title: 'Articles',
-                href: '/articles',
+                href: '/referentiel/articles',
                 icon: FileText,
             },
             {
                 title: 'Famille',
-                href: '/famille',
+                href: '/referentiel/famille',
                 icon: Box,
             },
             {
                 title: 'Sous Famille',
-                href: '/sous-famille',
+                href: '/referentiel/sous-famille',
                 icon: Layers,
             },
             {
                 title: 'Unite',
-                href: '/unite',
+                href: '/referentiel/unite',
                 icon: Compass,
             },
         ],

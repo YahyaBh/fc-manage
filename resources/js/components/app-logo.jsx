@@ -3,7 +3,6 @@ import AppLogoIcon from './app-logo-icon';
 
 export default function AppLogo() {
 
-
     const { user } = usePage().props.auth;
 
 
@@ -14,7 +13,7 @@ export default function AppLogo() {
             </div>
             <div className="ml-1 grid flex-1 text-left text-sm">
                 <span className="mb-0.5 truncate leading-none font-semibold">Sell & Buy Manager</span>
-                <span className='text-xs text-sidebar-secondary-foreground truncate leading-none opacity-50'>{user.role === 'client' ? 'Client' : user.role === 'admin' ? 'Admin' : user.role === 'provider' ? 'Seller' : ''}</span>
+                <span className='text-xs text-sidebar-secondary-foreground truncate leading-none opacity-50'>{user?.role === 'client' ? 'Client' : user?.role === 'admin' ? 'Admin' : user?.role === 'provider' ? 'Seller' : ''}</span>
             </div>
         </>
     );
