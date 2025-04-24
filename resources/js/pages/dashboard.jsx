@@ -297,7 +297,6 @@ export default function Dashboard() {
                                                 <th className="text-left px-4 py-4">Designation</th>
                                                 <th className="text-left px-4 py-4">Famille</th>
                                                 <th className="text-left px-4 py-4">Sous Famille</th>
-                                                <th className="text-left px-4 py-4">Qty</th>
                                                 <th className="text-left px-4 py-4">Statu</th>
                                                 <th className="text-left px-4 py-4">Date Creation</th>
                                             </tr>
@@ -323,7 +322,6 @@ export default function Dashboard() {
                                                         <td className="px-4 py-4">
                                                             {categories.find((cat) => cat.id === product?.cat_family_id)?.sub_families.find((subCat) => subCat.id === product?.cat_sous_family_id)?.intitule}
                                                         </td>
-                                                        <td className="px-4 py-4">{product?.qty}</td>
                                                         <td className="px-4 py-4">
                                                             {product?.status === 1 ? (
                                                                 <span className="text-green-500">Active</span>

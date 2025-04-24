@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             FamilySeeder::class,
+            UniteSeeder::class,
+            ArticleSeeder::class,
         ]);
 
         

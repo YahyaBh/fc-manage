@@ -203,7 +203,19 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function addSousCategory(Request $request) {}
+    public function addSousCategory(Request $request)
+    {
+        if (SubFamily::where(['intitule' => $request->intitule, 'cat_id' => $request->cat_id])->exists()) {
+            return Redirect::back()->with('error', 'Sous category already exists.');
+        }
+
+        $sousCategory = new SubFamily();
+        $sousCategory->intitule = $request->intitule;
+        $sousCategory->cat_id = $request->cat_id;
+        $sousCategory->save();
+
+        return Redirect::back()->with('message', 'Sous category added successfully.');
+    }
 
     public function showSousCategory(Request $request)
     {
@@ -214,8 +226,44 @@ class DashboardController extends Controller
                 'sousCategory' => $sousCategory,
             ]);
         } else {
-            return back()->with(['message' => 'Sous category not found.']);
+            return Redirect::back()->with(['error', 'Sous category not found.']);
         }
+    }
+
+    public function editSousCategory(Request $request, $id)
+    {
+        $sousCategory = SubFamily::find($id);
+
+        if ($request->intitule && $sousCategory->intitule != $request->intitule) {
+            $sousCategory->intitule = $request->intitule;
+        }
+
+        if ($request->cat_id && $sousCategory->cat_id != $request->cat_id) {
+            $sousCategory->cat_id = $request->cat_id;
+        }
+
+        if ($request->has('status') && $sousCategory->status !== $request->status) {
+            $sousCategory->status = $request->status;
+        }
+
+        $sousCategory->save();
+
+        return back()->with(['message' => 'Sous category updated successfully.']);
+    }
+
+    public function deleteSousCategory(Request $request)
+    {
+        if (is_array($request->ids)) {
+            foreach ($request->ids as $id) {
+                SubFamily::destroy($id);
+            }
+        } else if ($request->ids) {
+            SubFamily::destroy($request->ids);
+        } else {
+            return Redirect::back()->with(['error', 'No sous category selected.']);
+        }
+
+        return Redirect::back()->with(['message', 'Sous category(s) deleted successfully.']);
     }
 
 
@@ -229,4 +277,70 @@ class DashboardController extends Controller
             'unites' => $unites
         ]);
     }
+
+    public function addUnite(Request $request)
+    {
+        if (Unite::where(['intitule' => $request->intitule, 'code' => $request->code])->exists()) {
+            return Redirect::back()->with('error', 'Unite already exists.');
+        }
+
+        $unite = new Unite();
+        $unite->intitule = $request->intitule;
+        $unite->code = $request->code;
+        $unite->save();
+
+        return Redirect::back()->with('message', 'Unite added successfully.');
+    }
+
+    public function showUnite(Request $request)
+    {
+        $unite = Unite::find($request->id);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'unite' => $unite,
+            ]);
+        } else {
+            return Redirect::back()->with(['error', 'Unite not found.']);
+        }
+    }
+
+    public function editUnite(Request $request, $id)
+    {
+        $unite = Unite::find($id);
+
+        if ($request->intitule && $unite->intitule != $request->intitule) {
+            $unite->intitule = $request->intitule;
+        }
+
+        if ($request->code && $unite->code != $request->code) {
+            $unite->code = $request->code;
+        }
+
+        if ($request->has('status') && $unite->status !== $request->status) {
+            $unite->status = $request->status;
+        }
+
+        $unite->save();
+
+        return Redirect::back()->with(['message', 'Unite updated successfully.']);
+    }
+
+
+    public function deleteUnite(Request $request)
+    {
+        if (is_array($request->ids)) {
+            foreach ($request->ids as $id) {
+                Unite::destroy($id);
+            }
+        } else if ($request->ids) {
+            Unite::destroy($request->ids);
+        } else {
+            return Redirect::back()->with(['error', 'No unite selected.']);
+        }
+
+        return Redirect::back()->with(['message', 'Unite(s) deleted successfully.']);
+    }
+
+    
 }

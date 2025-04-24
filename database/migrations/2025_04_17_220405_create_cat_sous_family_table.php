@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cat_id')->constrained('cat_family')->onDelete('cascade');
             $table->string('intitule');
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

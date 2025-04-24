@@ -334,7 +334,7 @@ export default function Category() {
                                         {categories.map((product) => {
                                             const isItemSelected = isSelected(product.id);
                                             return (
-                                                <tr key={product.id} className={isItemSelected ? 'bg-gray-600' : ''}>
+                                                <tr key={product.id} className={isItemSelected ? 'bg-gray-900' : ''}>
                                                     <td className="px-4 py-4">
                                                         <input
                                                             type="checkbox"

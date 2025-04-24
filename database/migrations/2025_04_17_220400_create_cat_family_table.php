@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('cat_family', function (Blueprint $table) {
             $table->id();
             $table->string('intitule');
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

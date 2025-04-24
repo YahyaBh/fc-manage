@@ -14,6 +14,7 @@ import dashboardIcon from '../../../assets/dashboard/dashboard_icon.png'
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { PencilRuler } from 'lucide-react';
+import axios from 'axios';
 
 const MySwal = withReactContent(Swal);
 
@@ -32,58 +33,96 @@ export default function Unite() {
     const [selected, setSelected] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const [isModalEditOpen, setIsModalOpenEdit] = useState(false);
+
+    const [unite, setUnite] = useState({});
 
     const { data, setData, post, processing, errors, reset } = useForm({
         id: '',
-        designation: '',
-        family_id: '',
-        sous_family_id: '',
-        qty: '',
+        intitule: '',
+        code: '',
         status: 1,
         user_id: auth.user.id,
     });
 
     const moadlControl = () => setIsModalOpen((v) => !v);
+    const modalEditControl = () => setIsModalOpenEdit((v) => !v);
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleCategoryChange = (e) => {
-        const family_id = e.target.value;
-        setData((prev) => ({
-            ...prev,
-            family_id,
-            sous_family_id: '', // reset when family changes
-        }));
-    };
+    const handleInputChangeEdit = (e) => {
+        const { name, value } = e.target;
+        setUnite((prev) => ({ ...prev, [name]: value }));
+    }
 
-    const handleSubcategoryChange = (e) => {
-        const sous_family_id = e.target.value;
-        setData((prev) => ({ ...prev, sous_family_id }));
-    };
 
     const handleAddUnite = (e) => {
         e.preventDefault();
 
-        if (!data.designation || !data.family_id || !data.sous_family_id || !data.qty) {
+        if (!data.intitule || !data.code || !data.status || !data.user_id) {
             toast.error('Veuillez remplir tous les champs');
             return;
         } else {
-            post('/article/add', {
+            post('/unite/add', {
                 data: data,
-                onSuccess: () => {
+                onSuccess: (page) => {
                     moadlControl();
                     reset();
-                    toast.success('Article ajouté avec succès');
+
+                    if (page?.props?.flash?.error) {
+                        toast.error(page?.props?.flash.error);
+                    } else if (page?.props?.flash?.message) {
+                        toast.success(page?.props?.flash.message);
+                    } else {
+                        toast.success('Unite ajoutée avec succès');
+                    }
                 },
-                onError: () => {
-                    toast.error('Échec de l\'ajout');
+                onError: (errors) => {
+                    if (errors.intitule) {
+                        toast.error(errors.intitule[0]);
+                    } else {
+                        toast.error("Échec de l'ajout");
+                    }
                 },
             });
         }
     };
+
+    async function handleGetUnite(id) {
+        try {
+            const response = await axios.get(`/unite/show?id=${id}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            modalEditControl();
+            setUnite(response.data.unite);
+        } catch (error) {
+            console.error('Failed to fetch unite:', error);
+            toast.error('Échec de la récupération de l unite');
+        }
+    }
+
+    const handleEditUnite = (e) => {
+        e.preventDefault();
+
+        router.put(`/unite/${unite.id}/edit/`, unite, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                modalEditControl();
+                toast.success('Sous Famille modifié avec succès');
+            },
+            onError: () => {
+                toast.error('Échec de la modification');
+            },
+        });
+    }
 
     const handleDeleteUnite = () => {
         if (selected.length === 0) {
@@ -154,6 +193,11 @@ export default function Unite() {
     };
 
 
+    const handleStatusChangeEdit = (newStatus) => {
+        setUnite((prev) => ({ ...prev, status: newStatus === true ? 1 : 0 }));
+    };
+
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Unite" />
@@ -161,99 +205,210 @@ export default function Unite() {
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border md:min-h-min">
 
 
-
-
-                    <>
-                        <div className="flex gap-4 justify-end p-4">
-
-                            {selected.length > 0 && (
-                                <button onClick={handleDeleteUnite} className="bg-red-500 text-black px-4 py-2 rounded-md">Delete</button>
-                            )}
-
-                            <button
-                                onClick={moadlControl}
-                                className="bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer"
-                            >
-                                <IoIosAdd /> Ajouter
-                            </button>
-                        </div>
-                        {unites && unites.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full table-auto">
-                                    <thead>
-                                        <tr className='text-xl'>
-                                            <th className="text-left px-4 py-4">
-                                                <input
-                                                    type="checkbox"
-                                                    onChange={handleSelectAll}
-                                                    checked={selected.length === unites.length && unites.length > 0}
-                                                    className="form-checkbox text-blue-600"
-                                                />
-                                            </th>
-                                            <th className="text-left px-4 py-4">_ID</th>
-                                            <th className="text-left px-4 py-4">Intitule</th>
-                                            <th className="text-left px-4 py-4">Code</th>
-                                            <th className="text-left px-4 py-4">Status</th>
-                                            <th className="text-left px-4 py-4">Date Creation</th>
-                                            <th className="text-left px-4 py-4">Modif</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {unites.map((product) => {
-                                            const isItemSelected = isSelected(product.id);
-                                            return (
-                                                <tr key={product.id} className={isItemSelected ? 'bg-gray-100' : ''}>
-                                                    <td className="px-4 py-4">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={isItemSelected}
-                                                            onChange={() => handleSelect(product.id)}
-                                                            className="form-checkbox text-blue-600"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-4 text-center">{product?.id}</td>
-                                                    <td className="px-4 py-4">{product?.intitule}</td>
-                                                    <td className="px-4 py-4">{product?.code}</td>
-                                                    <td className="px-4 py-4">
-                                                        {product?.status === 1 ? (
-                                                            <span className="text-green-500">Active</span>
-                                                        ) : (
-                                                            <span className="text-red-500">Inactive</span>
-                                                        )}
-                                                    </td>
-                                                    <td className="px-4 py-4">
-                                                        {dayjs(product?.created_at).fromNow()}<sub> ({dayjs(product?.created_at).format('YYYY-MM-DD HH:mm:ss')})</sub>
-                                                    </td>
-                                                    <td className="px-4 py-4">
-                                                        <PencilRuler className='cursor-pointer hover:opacity-20' onClick={(e) => handleGetSubCategory(product.id)} />
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            // Content if there are no unite
-                            <div className="flex h-full w-full items-center justify-center">
-                                <div className="text-center">
-                                    <div className="invert dark:brightness-0 dark:contrast-200">
-                                        <img
-                                            src={dashboardIcon}
-                                            className="mx-auto h-48 w-48 opacity-40"
-                                            alt="No unite"
-                                        />
-                                    </div>
-                                    <h1 className="text-2xl font-bold text-sidebar-text dark:text-sidebar-text-dark">
-                                        Welcome back <b>{auth.user.name.split(' ')[0]}  </b> to the Dashboard
-                                    </h1>
-                                    <p className="mt-2 text-sm text-sidebar-text dark:text-sidebar-text-dark">
-                                        This is the unite page.
-                                    </p>
+                    {isModalOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
+                            <div className="bg-[rgba(255,255,255,0.1)] bg-opacity-10 backdrop-blur-3xl rounded-lg w-full max-w-xl p-6 shadow-lg">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-xl font-semibold">Add New Unite</h2>
+                                    <button onClick={moadlControl} className="text-gray-500 hover:text-gray-800 text-2xl font-bold">
+                                        &times;
+                                    </button>
                                 </div>
+
+                                <form onSubmit={handleAddUnite} className="space-y-4">
+                                    <input
+                                        type="text"
+                                        name="intitule"
+                                        value={data.intitule}
+                                        onChange={handleInputChange}
+                                        placeholder="Intitule"
+                                        className="w-full border px-3 py-2 rounded"
+                                        required
+                                    />
+
+                                    <input
+                                        type="text"
+                                        name="code"
+                                        value={data.code}
+                                        onChange={handleInputChange}
+                                        placeholder="Code"
+                                        className="w-full border px-3 py-2 rounded"
+                                        required
+                                    />
+
+
+                                    <div className="flex flex-col gap-2">
+                                        <label htmlFor="status">Status : </label>
+                                        <ToggleSwitch initialStatus={data.status} onToggle={handleStatusChange} />
+                                    </div>
+
+                                    <div className="flex justify-end space-x-2 pt-4">
+                                        <button
+                                            type="button"
+                                            onClick={moadlControl}
+                                            className="px-4 py-2 text-black bg-gray-200 rounded hover:bg-gray-300"
+                                        >
+                                            Annuler
+                                        </button>
+                                        <button type='submit' className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                            Ajouter
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
+                        </div>
+                    )}
+
+
+                    {isModalEditOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
+                            <div className="bg-[rgba(255,255,255,0.1)] bg-opacity-10 backdrop-blur-3xl rounded-lg w-full max-w-xl p-6 shadow-lg">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-xl font-semibold">Edit Sub Category</h2>
+                                    <button onClick={modalEditControl} className="text-gray-500 hover:text-gray-800 text-2xl font-bold">
+                                        &times;
+                                    </button>
+                                </div>
+
+                                <form onSubmit={handleEditUnite} className="space-y-4">
+                                    <input
+                                        type="text"
+                                        name="intitule"
+                                        value={unite.intitule}
+                                        onChange={handleInputChangeEdit}
+                                        placeholder="Intitule"
+                                        className="w-full border px-3 py-2 rounded"
+                                        required
+                                    />
+
+                                    <input
+                                        type="text"
+                                        name="code"
+                                        value={unite.code}
+                                        onChange={handleInputChangeEdit}
+                                        placeholder="Code"
+                                        className="w-full border px-3 py-2 rounded"
+                                        required
+                                    />
+
+
+
+
+
+                                    <div className="flex flex-col gap-2">
+                                        <label htmlFor="status">Status : </label>
+                                        <ToggleSwitch initialStatus={unite.status} onToggle={handleStatusChangeEdit} />
+                                    </div>
+
+                                    <div className="flex justify-end space-x-2 pt-4">
+                                        <button
+                                            type="button"
+                                            onClick={modalEditControl}
+                                            className="px-4 py-2 text-black bg-gray-200 rounded hover:bg-gray-300"
+                                        >
+                                            Annuler
+                                        </button>
+                                        <button type='submit' className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                            Modifier
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+
+                    <div className="flex gap-4 justify-end p-4">
+
+                        {selected.length > 0 && (
+                            <button onClick={handleDeleteUnite} className="bg-red-500 text-black px-4 py-2 rounded-md">Delete</button>
                         )}
-                    </>
+
+                        <button
+                            onClick={moadlControl}
+                            className="bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer"
+                        >
+                            <IoIosAdd /> Ajouter
+                        </button>
+                    </div>
+
+
+                    {unites && unites.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full table-auto">
+                                <thead>
+                                    <tr className='text-xl'>
+                                        <th className="text-left px-4 py-4">
+                                            <input
+                                                type="checkbox"
+                                                onChange={handleSelectAll}
+                                                checked={selected.length === unites.length && unites.length > 0}
+                                                className="form-checkbox text-blue-600"
+                                            />
+                                        </th>
+                                        <th className="text-left px-4 py-4">_ID</th>
+                                        <th className="text-left px-4 py-4">Intitule</th>
+                                        <th className="text-left px-4 py-4">Code</th>
+                                        <th className="text-left px-4 py-4">Status</th>
+                                        <th className="text-left px-4 py-4">Date Creation</th>
+                                        <th className="text-left px-4 py-4">Modif</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {unites.map((product) => {
+                                        const isItemSelected = isSelected(product.id);
+                                        return (
+                                            <tr key={product.id} className={isItemSelected ? 'bg-gray-900' : ''}>
+                                                <td className="px-4 py-4">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isItemSelected}
+                                                        onChange={() => handleSelect(product.id)}
+                                                        className="form-checkbox text-blue-600"
+                                                    />
+                                                </td>
+                                                <td className="px-4 py-4 text-center">{product?.id}</td>
+                                                <td className="px-4 py-4">{product?.intitule}</td>
+                                                <td className="px-4 py-4">{product?.code}</td>
+                                                <td className="px-4 py-4">
+                                                    {product?.status === 1 ? (
+                                                        <span className="text-green-500">Active</span>
+                                                    ) : (
+                                                        <span className="text-red-500">Inactive</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    {dayjs(product?.created_at).fromNow()}<sub> ({dayjs(product?.created_at).format('YYYY-MM-DD HH:mm:ss')})</sub>
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    <PencilRuler className='cursor-pointer hover:opacity-20' onClick={(e) => handleGetUnite(product.id)} />
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        // Content if there are no unite
+                        <div className="flex h-full w-full items-center justify-center">
+                            <div className="text-center">
+                                <div className="invert dark:brightness-0 dark:contrast-200">
+                                    <img
+                                        src={dashboardIcon}
+                                        className="mx-auto h-48 w-48 opacity-40"
+                                        alt="No unite"
+                                    />
+                                </div>
+                                <h1 className="text-2xl font-bold text-sidebar-text dark:text-sidebar-text-dark">
+                                    Welcome back <b>{auth.user.name.split(' ')[0]}  </b> to the Dashboard
+                                </h1>
+                                <p className="mt-2 text-sm text-sidebar-text dark:text-sidebar-text-dark">
+                                    This is the unite page.
+                                </p>
+                            </div>
+                        </div>
+                    )}
 
 
                 </div>

@@ -64,18 +64,24 @@ export default function Category() {
     };
 
     const handleCategoryChange = (e) => {
-        setSelectedCategory(e.target.value);
-    };
-
-    const handleCategoryChangeEdit = (e) => {
-        const { value } = e.target;
-        setSubCategory((prev) => ({ ...prev, [family_id]: value }));
+        const { name, value } = e.target;
+        setData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleInputChangeEdit = (e) => {
         const { name, value } = e.target;
         setSubCategory((prev) => ({ ...prev, [name]: value }));
+    }
+
+
+    const handleCategoryChangeEdit = (e) => {
+        const { name, value } = e.target;
+        setSubCategory((prev) => ({ ...prev, [name]: value }));
     };
+
+
+
+
 
     useEffect(() => {
         if (selectedCategory) {
@@ -109,19 +115,30 @@ export default function Category() {
     const handleAddSubCategory = (e) => {
         e.preventDefault();
 
-        if (!data.designation || !data.family_id || !data.sous_family_id || !data.qty) {
+        if (!data.intitule || !data.cat_id || !data.status || !data.user_id) {
             toast.error('Veuillez remplir tous les champs');
             return;
         } else {
-            post('/article/add', {
+            post('/sous-famille/add', {
                 data: data,
-                onSuccess: () => {
+                onSuccess: (page) => {
                     moadlControl();
                     reset();
-                    toast.success('Article ajouté avec succès');
+
+                    if (page?.props?.flash?.error) {
+                        toast.error(page?.props?.flash.error);
+                    } else if (page?.props?.flash?.message) {
+                        toast.success(page?.props?.flash.message);
+                    } else {
+                        toast.success('Sous Famille ajoutée avec succès');
+                    }
                 },
-                onError: () => {
-                    toast.error('Échec de l\'ajout');
+                onError: (errors) => {
+                    if (errors.intitule) {
+                        toast.error(errors.intitule[0]);
+                    } else {
+                        toast.error("Échec de l'ajout");
+                    }
                 },
             });
         }
@@ -168,12 +185,12 @@ export default function Category() {
             },
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete('/article/delete', {
+                router.delete('/sous-famille/delete', {
                     data: { ids: selected },
                     preserveScroll: true,
                     preserveState: true,
                     onSuccess: () => {
-                        toast.success('Article supprimé avec succès');
+                        toast.success('Sous famille supprimé avec succès');
                         setSelected([]);
                     },
                     onError: () =>
@@ -214,7 +231,7 @@ export default function Category() {
     };
 
     const handleStatusChangeEdit = (newStatus) => {
-        setCategory((prev) => ({ ...prev, status: newStatus === true ? 1 : 0 }));
+        setSubCategory((prev) => ({ ...prev, status: newStatus === true ? 1 : 0 }));
     };
 
 
@@ -228,19 +245,19 @@ export default function Category() {
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
                             <div className="bg-[rgba(255,255,255,0.1)] bg-opacity-10 backdrop-blur-3xl rounded-lg w-full max-w-xl p-6 shadow-lg">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-semibold">Add New Product</h2>
+                                    <h2 className="text-xl font-semibold">Add New Sub Category</h2>
                                     <button onClick={moadlControl} className="text-gray-500 hover:text-gray-800 text-2xl font-bold">
                                         &times;
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleAddArticle} className="space-y-4">
+                                <form onSubmit={handleAddSubCategory} className="space-y-4">
                                     <input
                                         type="text"
                                         name="intitule"
                                         value={data.intitule}
                                         onChange={handleInputChange}
-                                        placeholder="Designation"
+                                        placeholder="Intitule"
                                         className="w-full border px-3 py-2 rounded"
                                         required
                                     />
@@ -249,9 +266,9 @@ export default function Category() {
                                     <div>
                                         <label className="block mb-1 text-sm font-medium text-white">Category</label>
                                         <select
-                                            name="family_id"
-                                            value={data.family_id}
-                                            onChange={handleCategoryChange}
+                                            name="cat_id"
+                                            value={data.cat_id}
+                                            onChange={handleInputChange}
                                             className="w-full border px-3 py-2 rounded text-gray"
                                             required
                                         >
@@ -280,7 +297,7 @@ export default function Category() {
                                         >
                                             Annuler
                                         </button>
-                                        <button onClick={(e) => handleAddArticle(e)} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                        <button type='submit' className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                             Ajouter
                                         </button>
                                     </div>
@@ -294,7 +311,7 @@ export default function Category() {
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
                             <div className="bg-[rgba(255,255,255,0.1)] bg-opacity-10 backdrop-blur-3xl rounded-lg w-full max-w-xl p-6 shadow-lg">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-semibold">Add New Product</h2>
+                                    <h2 className="text-xl font-semibold">Edit Sub Category</h2>
                                     <button onClick={modalEditControl} className="text-gray-500 hover:text-gray-800 text-2xl font-bold">
                                         &times;
                                     </button>
@@ -314,8 +331,8 @@ export default function Category() {
                                     <div>
                                         <label className="block mb-1 text-sm font-medium text-white">Category</label>
                                         <select
-                                            name="family_id"
-                                            value={subCategory.family_id}
+                                            name="cat_id"
+                                            value={subCategory.cat_id}
                                             onChange={handleCategoryChangeEdit}
                                             className="w-full border px-3 py-2 rounded text-gray"
                                             required
@@ -357,11 +374,10 @@ export default function Category() {
 
 
                     <div className="flex justify-between items-center w-full mb-4 p-4">
-                        {/* Left side: Filter only */}
                         <div>
                             <select
                                 value={selectedCategory}
-                                onChange={(e) => handleCategoryChange(e)}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
                                 className="border p-2 rounded-md"
                             >
                                 <option className='bg-black text-gray dark:bg-white dark:text-black' value="">Toutes les catégories</option>
@@ -371,10 +387,9 @@ export default function Category() {
                             </select>
                         </div>
 
-                        {/* Right side: Buttons */}
                         <div className="flex gap-2">
                             {selected.length > 0 && (
-                                <button onClick={handleDeleteArticle} className="bg-red-500 text-black px-4 py-2 rounded-md">Delete</button>
+                                <button onClick={handleDeleteSubCategory} className="bg-red-500 text-black px-4 py-2 rounded-md">Delete</button>
                             )}
 
                             <button
@@ -412,7 +427,7 @@ export default function Category() {
                                     {filteredSubCategories.map((product) => {
                                         const isItemSelected = isSelected(product.id);
                                         return (
-                                            <tr key={product.id} className={isItemSelected ? 'bg-gray-20' : ''}>
+                                            <tr key={product.id} className={isItemSelected ? 'bg-gray-900' : ''}>
                                                 <td className="px-4 py-4">
                                                     <input
                                                         type="checkbox"

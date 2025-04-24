@@ -519,7 +519,7 @@ export default function Articles() {
                                         .map((product) => {
                                             const isItemSelected = isSelected(product.id);
                                             return (
-                                                <tr key={product.id} className={isItemSelected ? 'bg-gray-100' : ''}>
+                                                <tr key={product.id} className={isItemSelected ? 'bg-gray-900' : ''}>
                                                     <td className="px-4 py-4">
                                                         <input
                                                             type="checkbox"

@@ -15,7 +15,7 @@ Route::get('/login', function () {
 })->name('login');
 
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified' ])->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('home');
 
@@ -38,33 +38,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/referentiel/sous-famille', [DashboardController::class, 'sousCategories'])->name('sous-famille');
     Route::post('/sous-famille/add', [DashboardController::class, 'addSousCategory'])->name('sous-famille.add');
     Route::get('/sous-famille/{id}', [DashboardController::class, 'showSousCategory'])->name('sous-famille.show');
-    Route::post('/sous-famille/{sous-famille}/edit', [DashboardController::class, 'editSousCategory'])->name('sous-famille.edit');
-    Route::delete('/sous-famille/{sous-famille}/delete', [DashboardController::class, 'deleteSousCategory'])->name('sous-famille.delete');
+    Route::put('/sous-famille/{id}/edit', [DashboardController::class, 'editSousCategory'])->name('sous-famille.edit');
+    Route::delete('/sous-famille/delete', [DashboardController::class, 'deleteSousCategory'])->name('sous-famille.delete');
 
     Route::get('/referentiel/unite', [DashboardController::class, 'unite'])->name('unite');
     Route::post('/unite/add', [DashboardController::class, 'addUnite'])->name('unite.add');
-    Route::get('/unite/{unite}', [DashboardController::class, 'showUnite'])->name('unite.show');
-    Route::post('/unite/{unite}/edit', [DashboardController::class, 'editUnite'])->name('unite.edit');
-    Route::delete('/unite/{unite}/delete', [DashboardController::class, 'deleteUnite'])->name('unite.delete');
-
-
-
+    Route::get('/unite/{id}', [DashboardController::class, 'showUnite'])->name('unite.show');
+    Route::put('/unite/{id}/edit', [DashboardController::class, 'editUnite'])->name('unite.edit');
+    Route::delete('/unite/delete', [DashboardController::class, 'deleteUnite'])->name('unite.delete');
     
 });
-
-
-
-// Route::middleware(['auth', 'client'])->get('/client-dashboard', function () {
-//     return Inertia::render('ClientDashboard');
-// });
-
-// Route::middleware(['auth', 'admin'])->get('/admin-dashboard', function () {
-//     return Inertia::render('AdminDashboard');
-// });
-
-// Route::middleware(['auth', 'provider'])->get('/provider-dashboard', function () {
-//     return Inertia::render('ProviderDashboard');
-// });
 
 
 
