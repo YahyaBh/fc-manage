@@ -343,4 +343,20 @@ class DashboardController extends Controller
     }
 
     
+
+
+    //fournisseur 
+
+    public function fournisseurArticles(Request $request)
+    {
+        $articles = Article::with(['family', 'subFamily', 'unite'])->get();
+        $categories = Family::with('subFamilies')->get();
+        $unites = Unite::all();
+
+        return Inertia::render('fournisseur/articles', [
+            'articles' => $articles,
+            'categories' => $categories,
+            'unites' => $unites
+        ]);
+    }
 }

@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Phone, LayoutGrid, DatabaseIcon, FileText, Box, Layers, Compass } from 'lucide-react';
+import { Phone, LayoutGrid, DatabaseIcon, FileText, Box, Layers, Compass, Handshake } from 'lucide-react';
 import AppLogo from './app-logo.jsx';
 
 const mainNavItems: NavItem[] = [
@@ -37,6 +37,25 @@ const mainNavItems: NavItem[] = [
                 title: 'Unite',
                 href: '/referentiel/unite',
                 icon: Compass,
+            },
+        ],
+    },
+    {
+        title: 'Fournisseur',
+        href: '/stock',
+        icon: Handshake,
+        subItems: [
+            {
+                //
+                title: 'Ajouter Des Articles',
+                href: '/fournisseur/articles',
+                icon: FileText,
+            },
+            {
+                //
+                title: "Mise a Jour les prix d'Articles",
+                href: '/fournisseur/articles',
+                icon: FileText,
             },
         ],
     },

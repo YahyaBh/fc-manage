@@ -46,7 +46,12 @@ Route::middleware(['auth', 'verified' ])->group(function () {
     Route::get('/unite/{id}', [DashboardController::class, 'showUnite'])->name('unite.show');
     Route::put('/unite/{id}/edit', [DashboardController::class, 'editUnite'])->name('unite.edit');
     Route::delete('/unite/delete', [DashboardController::class, 'deleteUnite'])->name('unite.delete');
-    
+
+
+    Route::get('/fournisseur/articles' , [DashboardController::class, 'fournisseurArticles'])->name('fournisseur.articles');
+    Route::post('/fournisseur/articles/add', [DashboardController::class, 'addFournisseurArticle'])->name('fournisseur.article.add');
+    Route::get('/fournisseur/articles/{id}', [DashboardController::class, 'showFournisseurArticle'])->name('fournisseur.article.show');
+
 });
 
 
