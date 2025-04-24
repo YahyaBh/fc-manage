@@ -320,7 +320,7 @@ export default function Dashboard() {
                                                             {categories.find((cat) => cat.id === product?.cat_family_id)?.intitule}
                                                         </td>
                                                         <td className="px-4 py-4">
-                                                            {categories.find((cat) => cat.id === product?.cat_family_id)?.sub_families.find((subCat) => subCat.id === product?.cat_sous_family_id)?.intitule}
+                                                            {categories.find((cat) => cat.id === product?.cat_sous_family_id)?.sub_families.find((subCat) => subCat.id === product?.cat_sous_family_id)?.intitule}
                                                         </td>
                                                         <td className="px-4 py-4">
                                                             {product?.status === 1 ? (

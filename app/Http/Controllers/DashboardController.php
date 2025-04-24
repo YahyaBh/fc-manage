@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Family;
+use App\Models\FisArticle;
 use App\Models\SubFamily;
 use App\Models\Unite;
 use Illuminate\Http\Request;
@@ -350,11 +351,15 @@ class DashboardController extends Controller
     public function fournisseurArticles(Request $request)
     {
         $articles = Article::with(['family', 'subFamily', 'unite'])->get();
+        $fis_articles = FisArticle::with(['family', 'subFamily', 'unite'])->get();
         $categories = Family::with('subFamilies')->get();
+        $sub_families = SubFamily::all();
         $unites = Unite::all();
 
         return Inertia::render('fournisseur/articles', [
+            // 'fis_articles' => $fis_articles,
             'articles' => $articles,
+            'sub_families' => $sub_families,
             'categories' => $categories,
             'unites' => $unites
         ]);

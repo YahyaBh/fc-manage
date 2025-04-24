@@ -13,7 +13,7 @@ import dashboardIcon from '../../../assets/dashboard/dashboard_icon.png'
 
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { PencilRuler } from 'lucide-react';
+import { ArrowUpToLine, PencilRuler } from 'lucide-react';
 import axios from 'axios';
 
 const MySwal = withReactContent(Swal);
@@ -53,62 +53,7 @@ export default function FisArticles() {
 
     const modalEditControl = () => setIsModalEditOpen((v) => !v);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setData((prev) => ({ ...prev, [name]: value }));
-    };
 
-    const handleCategoryChange = (e) => {
-        const family_id = e.target.value;
-        setData((prev) => ({
-            ...prev,
-            family_id,
-            sous_family_id: '',
-        }));
-    };
-
-    const handleSubcategoryChange = (e) => {
-        const sous_family_id = e.target.value;
-        setData((prev) => ({ ...prev, sous_family_id }));
-    };
-
-    const handleUniteChange = (e) => {
-        const unite = e.target.value;
-        setData((prev) => ({ ...prev, unite }));
-    }
-
-    const handleStatusChange = (newStatus) => {
-        setData((prev) => ({ ...prev, status: newStatus === true ? 1 : 0 }));
-    };
-
-
-    const handleInputChangeEdit = (e) => {
-        const { name, value } = e.target;
-        setArticle((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleCategoryChangeEdit = (e) => {
-        const family_id = e.target.value;
-        setArticle((prev) => ({
-            ...prev,
-            family_id,
-            sous_family_id: '',
-        }));
-    };
-
-    const handleSubcategoryChangeEdit = (e) => {
-        const sous_family_id = e.target.value;
-        setArticle((prev) => ({ ...prev, sous_family_id }));
-    };
-
-    const handleUniteChangeEdit = (e) => {
-        const unite = e.target.value;
-        setArticle((prev) => ({ ...prev, unite }));
-    }
-
-    const handleStatusChangeEdit = (newStatus) => {
-        setArticle((prev) => ({ ...prev, status: newStatus === true ? 1 : 0 }));
-    };
 
 
     const handleAddArticle = (e) => {
@@ -146,22 +91,6 @@ export default function FisArticles() {
         } catch (error) {
             console.error('Failed to fetch article:', error);
         }
-    }
-
-    const handleEditArticle = (e) => {
-        e.preventDefault();
-
-        router.put(`/article/${article.id}/edit/`, article, {
-            preserveScroll: true,
-            preserveState: true,
-            onSuccess: () => {
-                modalEditControl();
-                toast.success('Article modifié avec succès');
-            },
-            onError: () => {
-                toast.error('Échec de la modification');
-            },
-        });
     }
 
     const handleDeleteArticle = () => {
@@ -241,223 +170,36 @@ export default function FisArticles() {
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
                             <div className="bg-[rgba(255,255,255,0.1)] bg-opacity-10 backdrop-blur-3xl rounded-lg w-full max-w-xl p-6 shadow-lg">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-semibold">Ajouter Article</h2>
+                                    <h2 className="text-xl font-semibold">Articles Pour Ajouter</h2>
                                     <button onClick={moadlControl} className="text-gray-500 hover:text-gray-800 text-2xl font-bold">
                                         &times;
                                     </button>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <input
-                                        type="text"
-                                        name="designation"
-                                        value={data.name}
-                                        onChange={handleInputChange}
-                                        placeholder="Designation"
-                                        className="w-full border px-3 py-2 rounded"
-                                        required
-                                    />
-
-                                    {/* Unite */}
-                                    <div>
-                                        <label className="block mb-1 text-sm font-medium text-white">Unite</label>
-                                        <select
-                                            name="family_id"
-                                            value={data.unite}
-                                            onChange={handleUniteChange}
-                                            className="w-full border px-3 py-2 rounded text-gray"
-                                            required
-                                        >
-                                            <option disabled value="">
-                                                Select Unite
-                                            </option>
-                                            {unites.map((unite) => (
-                                                <option key={unite.id} value={unite.id} className='text-black'>
-                                                    {unite.intitule}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Category */}
-                                    <div>
-                                        <label className="block mb-1 text-sm font-medium text-white">Category</label>
-                                        <select
-                                            name="family_id"
-                                            value={data.family_id}
-                                            onChange={handleCategoryChange}
-                                            className="w-full border px-3 py-2 rounded text-gray"
-                                            required
-                                        >
-                                            <option disabled value="">
-                                                Select Category
-                                            </option>
-                                            {categories.map((cat) => (
-                                                <option key={cat.id} value={cat.id} className='text-black'>
-                                                    {cat.intitule}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Subcategory */}
-                                    {data.family_id && categories.find(cat => cat.id === Number(data.family_id))?.sub_families.length > 0 && (
-                                        <div>
-                                            <label className="block mb-1 text-sm font-medium text-white">Subcategory</label>
-                                            <select
-                                                name="sous_family_id"
-                                                value={data.sous_family_id}
-                                                onChange={handleSubcategoryChange}
-                                                className="w-full border px-3 py-2 rounded"
-                                                required
-                                            >
-                                                <option disabled value="" className='text-gray'>
-                                                    Select Subcategory
-                                                </option>
-                                                {categories
-                                                    .find((cat) => cat.id === Number(data.family_id))
-                                                    ?.sub_families.map((sub) => (
-                                                        <option key={sub.id} value={sub.id} className='text-black'>
-                                                            {sub.intitule}
-                                                        </option>
-                                                    ))}
-                                            </select>
-                                        </div>
-                                    )}
-
-                                    <div className="flex flex-col gap-2">
-                                        <label htmlFor="status">Status : </label>
-                                        <ToggleSwitch initialStatus={data.status} onToggle={handleStatusChange} />
-                                    </div>
-
-                                    <div className="flex justify-end space-x-2 pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={moadlControl}
-                                            className="px-4 py-2 text-black bg-gray-200 rounded hover:bg-gray-300"
-                                        >
-                                            Annuler
-                                        </button>
-                                        <button onClick={(e) => handleAddArticle(e)} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                            Ajouter
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-
-                    {isModalEditOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
-                            <div className="bg-[rgba(255,255,255,0.1)] bg-opacity-10 backdrop-blur-3xl rounded-lg w-full max-w-xl p-6 shadow-lg">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-semibold">Add New Product</h2>
-                                    <button onClick={modalEditControl} className="text-gray-500 hover:text-gray-800 text-2xl font-bold">
-                                        &times;
+                                    <p className="text-white">
+                                        {selected.length} articles sélectionnés
+                                    </p>
+                                </div>
+
+
+                                <div className="flex justify-end space-x-2 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={moadlControl}
+                                        className="px-4 py-2 text-black bg-gray-200 rounded hover:bg-gray-300"
+                                    >
+                                        Annuler
+                                    </button>
+                                    <button onClick={(e) => handleAddArticle(e)} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                        Ajouter
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleEditArticle} className="space-y-4">
-                                    <input
-                                        type="text"
-                                        name="designation"
-                                        value={article.designation}
-                                        onChange={handleInputChangeEdit}
-                                        placeholder="Designation"
-                                        className="w-full border px-3 py-2 rounded"
-                                        required
-                                    />
 
-                                    {/* Unite */}
-                                    <div>
-                                        <label className="block mb-1 text-sm font-medium text-white">Unite</label>
-                                        <select
-                                            name="family_id"
-                                            value={article.unite}
-                                            onChange={handleUniteChangeEdit}
-                                            className="w-full border px-3 py-2 rounded text-gray"
-                                            required
-                                        >
-                                            <option disabled value="">
-                                                Select Unite
-                                            </option>
-                                            {unites.map((unite) => (
-                                                <option key={unite.id} value={unite.id} className='text-black'>
-                                                    {unite.intitule}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Category */}
-                                    <div>
-                                        <label className="block mb-1 text-sm font-medium text-white">Category</label>
-                                        <select
-                                            name="family_id"
-                                            value={article.family_id}
-                                            onChange={handleCategoryChangeEdit}
-                                            className="w-full border px-3 py-2 rounded text-gray"
-                                            required
-                                        >
-                                            <option disabled value="">
-                                                Select Category
-                                            </option>
-                                            {categories.map((cat) => (
-                                                <option key={cat.id} value={cat.id} className='text-black'>
-                                                    {cat.intitule}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Subcategory */}
-                                    {article.family_id && categories.find(cat => cat.id === Number(article.family_id))?.sub_families.length > 0 && (
-                                        <div>
-                                            <label className="block mb-1 text-sm font-medium text-white">Subcategory</label>
-                                            <select
-                                                name="sous_family_id"
-                                                value={article.sous_family_id}
-                                                onChange={handleSubcategoryChangeEdit}
-                                                className="w-full border px-3 py-2 rounded"
-                                                required
-                                            >
-                                                <option disabled value="" className='text-gray'>
-                                                    Select Subcategory
-                                                </option>
-                                                {categories
-                                                    .find((cat) => cat.id === Number(article.family_id))
-                                                    ?.sub_families.map((sub) => (
-                                                        <option key={sub.id} value={sub.id} className='text-black'>
-                                                            {sub.intitule}
-                                                        </option>
-                                                    ))}
-                                            </select>
-                                        </div>
-                                    )}
-
-                                    <div className="flex flex-col gap-2">
-                                        <label htmlFor="status">Status : </label>
-                                        <ToggleSwitch initialStatus={article.status} onToggle={handleStatusChangeEdit} />
-                                    </div>
-
-                                    <div className="flex justify-end space-x-2 pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={modalEditControl}
-                                            className="px-4 py-2 text-black bg-gray-200 rounded hover:bg-gray-300"
-                                        >
-                                            Annuler
-                                        </button>
-                                        <button type='submit' className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                            Modifier
-                                        </button>
-                                    </div>
-                                </form>
                             </div>
                         </div>
                     )}
-
 
 
                     <div className="flex justify-between items-center w-full mb-4 p-4">
@@ -483,7 +225,7 @@ export default function FisArticles() {
                                 onClick={moadlControl}
                                 className="bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer"
                             >
-                                <IoIosAdd /> Ajouter
+                                <ArrowUpToLine /> Ajouter
                             </button>
                         </div>
                     </div>
@@ -508,7 +250,7 @@ export default function FisArticles() {
                                         <th className="text-left px-4 py-4">Unite</th>
                                         <th className="text-left px-4 py-4">Statu</th>
                                         <th className="text-left px-4 py-4">Date Creation</th>
-                                        <th className="text-left px-4 py-4">Modif</th>
+                                        {/* <th className="text-left px-4 py-4">Modif</th> */}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -534,7 +276,7 @@ export default function FisArticles() {
                                                         {categories.find((cat) => cat.id === product?.cat_family_id)?.intitule}
                                                     </td>
                                                     <td className="px-4 py-4">
-                                                        {categories.find((cat) => cat.id === product?.cat_family_id)?.sub_families.find((subCat) => subCat.id === product?.cat_sous_family_id)?.intitule}
+                                                        {categories.find((cat) => cat.id === product?.cat_sous_family_id)?.sub_families.find((subCat) => subCat.id === product?.cat_sous_family_id)?.intitule}
                                                     </td>
                                                     <td className="px-4 py-4">
                                                         {unites.find((unite) => unite.id === product?.unite_id)?.intitule}
@@ -549,9 +291,9 @@ export default function FisArticles() {
                                                     <td className="px-4 py-4">
                                                         {dayjs(product?.created_at).fromNow()}<sub> ({dayjs(product?.created_at).format('YYYY-MM-DD HH:mm:ss')})</sub>
                                                     </td>
-                                                    <td className="px-4 py-4">
+                                                    {/* <td className="px-4 py-4">
                                                         <PencilRuler className='cursor-pointer hover:opacity-20' onClick={(e) => handleGetArticle(product.id)} />
-                                                    </td>
+                                                    </td> */}
                                                 </tr>
                                             );
                                         })}
@@ -588,3 +330,26 @@ export default function FisArticles() {
     );
 }
 
+
+const ToggleSwitch = ({ initialStatus, onToggle }) => {
+    const [checked, setChecked] = useState(initialStatus);
+
+    const handleChange = (event) => {
+        const newStatus = event.target.checked;
+        setChecked(newStatus);
+        if (onToggle) onToggle(newStatus);
+    };
+
+    return (
+        <div className={'inline-flex items-center cursor-pointer px-2 py-1 rounded-ful text-white'}>
+
+            <span className="mr-2 text-sm">{checked ? 'Enabled' : 'Disabled'}</span>
+            <Switch
+                checked={checked}
+                onChange={handleChange}
+                inputProps={{ 'aria-label': 'toggle status' }}
+                size="small"
+            />
+        </div >
+    );
+};
