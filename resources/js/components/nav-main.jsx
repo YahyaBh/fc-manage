@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 
-export function NavMain({ items = [] }: { items: NavItem[] }) {
+export function NavMain({ items = [] }) {
     const page = usePage();
 
 
@@ -15,11 +14,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             .map(item => item.title);
     };
 
-    const [openItems, setOpenItems] = useState<string[]>(getInitiallyOpenItems());
+    const [openItems, setOpenItems] = useState(getInitiallyOpenItems());
 
 
 
-    const toggleSubcategories = (title: string) => {
+    const toggleSubcategories = (title) => {
         setOpenItems((prevState) =>
             prevState.includes(title)
                 ? prevState.filter((item) => item !== title)
