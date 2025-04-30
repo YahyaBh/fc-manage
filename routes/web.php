@@ -49,9 +49,12 @@ Route::middleware(['auth', 'verified' ])->group(function () {
 
 
     Route::get('/fournisseur/articles' , [DashboardController::class, 'fournisseurArticles'])->name('fournisseur.articles');
-    Route::post('/fournisseur/articles/add', [DashboardController::class, 'addFournisseurArticle'])->name('fournisseur.article.add');
-    Route::get('/fournisseur/articles/{id}', [DashboardController::class, 'showFournisseurArticle'])->name('fournisseur.article.show');
+    Route::post('/fournisseur/articles/add', [DashboardController::class, 'addFisArticles'])->name('fournisseur.article.add');
+    Route::get('/fournisseur/articles/{id}', [DashboardController::class, 'showFisArticle'])->name('fournisseur.article.show');
+    Route::delete('/fournisseur/articles/delete', [DashboardController::class, 'deleteFisArticle'])->name('fournisseur.article.delete');
 
+
+    Route::get('/fournisseur/price-update' , [DashboardController::class , 'priceUpdate'])->name('fournisseur.priceUpdate');
 });
 
 

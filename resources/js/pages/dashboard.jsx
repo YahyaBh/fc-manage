@@ -54,7 +54,7 @@ export default function Dashboard() {
         setData((prev) => ({
             ...prev,
             family_id,
-            sous_family_id: '', // reset when family changes
+            sous_family_id: '',
         }));
     };
 

@@ -30,4 +30,10 @@ class Article extends Model
     {
         return $this->belongsTo(Unite::class);
     }
+
+
+    public function fisArticle()
+    {
+        return $this->hasOne(FisArticle::class, 'article_id');
+    }
 }

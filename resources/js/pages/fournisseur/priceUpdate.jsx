@@ -17,15 +17,16 @@ const MySwal = withReactContent(Swal);
 
 const breadcrumbs = [
     {
-        title: 'Fournisseur Articles',
-        href: '/fournisseur/articles',
+        title: 'Fournisseur Pirce Update',
+        href: '/fournisseur/price-update',
     },
 ];
 
 dayjs.extend(relativeTime);
 
-export default function ArticlesFis() {
-    const { auth, articles, categories, unites } = usePage().props;
+export default function PriceUpdate() {
+    const { auth, fis_articles, categories, unites } = usePage().props;
+
 
     const [selected, setSelected] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,36 +44,7 @@ export default function ArticlesFis() {
 
 
 
-    const handleAddArticle = (e) => {
-        e.preventDefault();
 
-        if (selected.length === 0) {
-            toast.error('Veuillez sélectionner au moins un article');
-            return;
-        } else {
-            router.post(
-                '/fournisseur/articles/add',
-                { ids: selected },
-                {
-                    preserveScroll: true,
-                    preserveState: true,
-                    onSuccess: (page) => {
-                        if (page.props.flash.error) {
-                            toast.error(page.props.flash.error || "Article has not been Added")
-                        } else {
-                            toast.success(page.props.flash.message || "Article has been added")
-                            setSelected([])
-                            moadlControl()
-                        }
-                    },
-                    onError: () => {
-                        toast.error("Échec de l'ajout")
-                    },
-                }
-            );
-
-        }
-    };
 
 
     const handleDeleteArticle = () => {
@@ -115,9 +87,12 @@ export default function ArticlesFis() {
         });
     };
 
+
+
+
     const handleSelectAll = (event) => {
         if (event.target.checked) {
-            const newSelected = articles && articles.map((product) => product.id);
+            const newSelected = fis_articles && fis_articles.map((product) => product.id);
             setSelected(newSelected);
             return;
         }
@@ -144,47 +119,9 @@ export default function ArticlesFis() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Articles" />
+            <Head title="Price Update" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border md:min-h-min">
-
-                    {isModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
-                            <div className="bg-[rgba(255,255,255,0.1)] bg-opacity-10 backdrop-blur-3xl rounded-lg w-full max-w-xl p-6 shadow-lg">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-semibold">Add New Product</h2>
-                                    <button onClick={moadlControl} className="text-gray-500 hover:text-gray-800 text-2xl font-bold">
-                                        &times;
-                                    </button>
-                                </div>
-
-                                <div className="space-y-4">
-
-
-
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h3> Selected Articles : {selected.length}</h3>
-                                    </div>
-
-                                    <div className="flex justify-end space-x-2 pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={moadlControl}
-                                            className="px-4 py-2 text-black bg-gray-200 rounded hover:bg-gray-300"
-                                        >
-                                            Annuler
-                                        </button>
-                                        <button onClick={(e) => handleAddArticle(e)} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                            Ajouter
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-
-
 
                     <div className="flex justify-between items-center w-full mb-4 p-4">
 
@@ -201,7 +138,7 @@ export default function ArticlesFis() {
                             className="border p-2 rounded-md"
                         />
                         <datalist id="categories">
-                            {categories.map(cat => (
+                            {categories?.map(cat => (
                                 <option key={cat.id} value={cat.intitule} />
                             ))}
                         </datalist>
@@ -221,7 +158,7 @@ export default function ArticlesFis() {
                         </div>
                     </div>
 
-                    {articles && articles.length > 0 ? (
+                    {fis_articles && fis_articles.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="min-w-full table-auto">
                                 <thead>
@@ -230,7 +167,7 @@ export default function ArticlesFis() {
                                             <input
                                                 type="checkbox"
                                                 onChange={handleSelectAll}
-                                                checked={selected.length === articles.length && articles.length > 0}
+                                                checked={selected.length === fis_articles.length && fis_articles.length > 0}
                                                 className="form-checkbox text-blue-600"
                                             />
                                         </th>
@@ -244,44 +181,41 @@ export default function ArticlesFis() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {articles
-                                        .filter(article =>
-                                            filterCategoryId === ""
+                                    {fis_articles
+                                        .filter(f =>
+                                            !filterCategoryId
                                                 ? true
-                                                : String(article.cat_family_id) === filterCategoryId
+                                                : String(f.article.family?.id) === filterCategoryId
                                         )
-                                        .map((product) => {
-                                            const isItemSelected = isSelected(product.id);
+                                        .map((f) => {
+                                            const isItemSelected = isSelected(f.id);
                                             return (
-                                                <tr key={product.id} className={isItemSelected ? 'bg-gray-900' : ''}>
+                                                <tr key={f.id} className={isItemSelected ? 'bg-gray-900' : ''}>
                                                     <td className="px-4 py-4">
                                                         <input
                                                             type="checkbox"
                                                             checked={isItemSelected}
-                                                            onChange={() => handleSelect(product.id)}
+                                                            onChange={() => handleSelect(f.id)}
                                                             className="form-checkbox text-blue-600"
                                                         />
                                                     </td>
-                                                    <td className="px-4 py-4 text-center">{product?.id}</td>
-                                                    <td className="px-4 py-4">{product?.designation}</td>
+                                                    <td className="px-4 py-4 text-center">{f?.id}</td>
+                                                    {/* article fields */}
+                                                    <td className="px-4 py-4">{f.article?.designation}</td>
+                                                    <td className="px-4 py-4">{f.article.family?.intitule ?? '—'}</td>
+                                                    <td className="px-4 py-4">{f.article.sub_family?.intitule}</td>
+                                                    <td className="px-4 py-4">{f.article.unite?.intitule}</td>
+
                                                     <td className="px-4 py-4">
-                                                        {categories.find((cat) => cat.id === product?.cat_family_id)?.intitule}
-                                                    </td>
-                                                    <td className="px-4 py-4">
-                                                        {categories.find((cat) => cat.id === product?.cat_sous_family_id)?.sub_families.find((subCat) => subCat.id === product?.cat_sous_family_id)?.intitule}
-                                                    </td>
-                                                    <td className="px-4 py-4">
-                                                        {unites.find((unite) => unite.id === product?.unite_id)?.intitule}
-                                                    </td>
-                                                    <td className="px-4 py-4">
-                                                        {product?.status === 1 ? (
+                                                        {f?.status === 1 ? (
                                                             <span className="text-green-500">Active</span>
                                                         ) : (
                                                             <span className="text-red-500">Inactive</span>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-4">
-                                                        {dayjs(product?.created_at).fromNow()}<sub> ({dayjs(product?.created_at).format('YYYY-MM-DD HH:mm:ss')})</sub>
+                                                        {dayjs(f.created_at).fromNow()}
+                                                        <sub>({dayjs(f.created_at).format('YYYY-MM-DD HH:mm:ss')})</sub>
                                                     </td>
 
                                                 </tr>
@@ -291,14 +225,14 @@ export default function ArticlesFis() {
                             </table>
                         </div>
                     ) : (
-                        // Content if there are no articles
+                        // Content if there are no fis_articles
                         <div className="flex h-full w-full items-center justify-center">
                             <div className="text-center">
                                 <div className="invert dark:brightness-0 dark:contrast-200">
                                     <img
                                         src={dashboardIcon}
                                         className="mx-auto h-48 w-48 opacity-40"
-                                        alt="No articles"
+                                        alt="No fis_articles"
                                     />
                                 </div>
                                 <h1 className="text-2xl font-bold text-sidebar-text dark:text-sidebar-text-dark">

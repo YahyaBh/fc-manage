@@ -54,7 +54,7 @@ const mainNavItems: NavItem[] = [
             {
                 //
                 title: "Mise a Jour les prix d'Articles",
-                href: '/fournisseur/articles',
+                href: '/fournisseur/price-update',
                 icon: FileText,
             },
         ],

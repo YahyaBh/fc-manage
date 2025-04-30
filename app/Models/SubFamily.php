@@ -14,7 +14,7 @@ class SubFamily extends Model
 
     protected $fillable = ['cat_id', 'intitule'];
 
-    public function family()
+    public function Family()
     {
         return $this->belongsTo(Family::class, 'cat_id');
     }

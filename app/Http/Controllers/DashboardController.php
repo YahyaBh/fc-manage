@@ -11,6 +11,7 @@ use App\Models\Unite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Response;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -343,25 +344,113 @@ class DashboardController extends Controller
         return Redirect::back()->with(['message', 'Unite(s) deleted successfully.']);
     }
 
-    
+
 
 
     //fournisseur 
 
     public function fournisseurArticles(Request $request)
     {
-        $articles = Article::with(['family', 'subFamily', 'unite'])->get();
-        $fis_articles = FisArticle::with(['family', 'subFamily', 'unite'])->get();
+        $fis_articles = FisArticle::where('fis_id', 2)->pluck('article_id')->toArray();
+
+        $articles = Article::with(['family', 'subFamily', 'unite'])
+            ->whereNotIn('id', $fis_articles)
+            ->get();
+
         $categories = Family::with('subFamilies')->get();
         $sub_families = SubFamily::all();
         $unites = Unite::all();
 
         return Inertia::render('fournisseur/articles', [
-            // 'fis_articles' => $fis_articles,
             'articles' => $articles,
+            'fis_articles' => $fis_articles,
             'sub_families' => $sub_families,
             'categories' => $categories,
             'unites' => $unites
+        ]);
+    }
+
+
+    public function addFisArticles(Request $request)
+    {
+        $user = Auth::user();
+
+        $ids = $request->ids;
+        if (! $ids) {
+            return Redirect::back()->with('error', 'No articles selected.');
+        }
+
+        $ids = is_array($ids) ? $ids : [$ids];
+
+        $added    = [];
+        $skipped  = [];
+
+        foreach ($ids as $id) {
+            $article = Article::find($id);
+            if (! $article) {
+                $skipped[] = "ID {$id} not found";
+                continue;
+            }
+
+            $exists = FisArticle::where('article_id', $id)->exists();
+            if ($exists) {
+                $skipped[] = "Article #{$id} already exists";
+                continue;
+            }
+
+            FisArticle::create([
+                'article_id' => $id,
+                'user_id'    => $user->id,
+                'fis_id'     => 2,
+            ]);
+            $added[] = $id;
+        }
+
+        $messages = [];
+        if (count($added) > 0) {
+            $messages[] = "Added articles: " . implode(', ', $added);
+        }
+        if (count($skipped) > 0) {
+            $messages[] = "Skipped: " . implode('; ', $skipped);
+        }
+
+        $flashType = count($added) > 0 ? 'message' : 'error';
+        return Redirect::back()->with($flashType, implode(' | ', $messages));
+    }
+
+
+
+    public function deleteFournisseurArticle(Request $request)
+    {
+        if (is_array($request->ids)) {
+            foreach ($request->ids as $id) {
+                FisArticle::destroy($id);
+            }
+        } else if ($request->ids) {
+            FisArticle::destroy($request->ids);
+        } else {
+            return Redirect::back()->with(['error', 'No article selected.']);
+        }
+    }
+
+
+
+
+    public function priceUpdate(Request $request)
+    {
+
+
+        $fis_articles = FisArticle::with([
+            'article.family',
+            'article.subFamily',
+            'article.unite',
+        ])
+            ->where('fis_id', 2)
+            ->get();
+
+
+        return Inertia::render('fournisseur/priceUpdate', [
+            'fis_articles' => $fis_articles
         ]);
     }
 }

@@ -38,6 +38,9 @@ export default function Category() {
 
 
     const [selectedCategory, setSelectedCategory] = useState("");
+
+    const [filterText, setFilterText] = useState("");
+    const [filterCategoryId, setFilterCategoryId] = useState("");
     const [filteredSubCategories, setFilteredSubCategories] = useState(sub_categories);
 
 
@@ -84,16 +87,24 @@ export default function Category() {
 
 
     useEffect(() => {
-        if (selectedCategory) {
-            setFilteredSubCategories(
-                sub_categories.filter(
-                    sub => String(sub.cat_id) === selectedCategory
-                )
-            );
-        } else {
-            setFilteredSubCategories(sub_categories);
+        if (!filterText) {
+            setFilterCategoryId("");
+            return;
         }
-    }, [selectedCategory, sub_categories]);
+        const match = categories.find(c => c.intitule === filterText);
+        setFilterCategoryId(match ? String(match.id) : "");
+    }, [filterText, categories]);
+
+    // now filter the sub-categories by the resolved categoryId
+    useEffect(() => {
+        if (!filterCategoryId) {
+            setFilteredSubCategories(sub_categories);
+        } else {
+            setFilteredSubCategories(
+                sub_categories.filter(sub => String(sub.cat_id) === filterCategoryId)
+            );
+        }
+    }, [filterCategoryId, sub_categories]);
 
 
     async function handleGetSubCategory(id) {
@@ -375,16 +386,18 @@ export default function Category() {
 
                     <div className="flex justify-between items-center w-full mb-4 p-4">
                         <div>
-                            <select
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
+                            <input
+                                list="categoryList"
+                                value={filterText}
+                                onChange={e => setFilterText(e.target.value)}
+                                placeholder="Toutes les catégories"
                                 className="border p-2 rounded-md"
-                            >
-                                <option className='bg-black text-gray dark:bg-white dark:text-black' value="">Toutes les catégories</option>
+                            />
+                            <datalist id="categoryList">
                                 {categories.map(cat => (
-                                    <option className='bg-black text-white dark:bg-white dark:text-black' key={cat.id} value={cat.id}>{cat.intitule}</option>
+                                    <option key={cat.id} value={cat.intitule} />
                                 ))}
-                            </select>
+                            </datalist>
                         </div>
 
                         <div className="flex gap-2">

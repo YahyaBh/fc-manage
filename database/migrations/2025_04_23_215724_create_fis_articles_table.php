@@ -13,13 +13,20 @@ return new class extends Migration
     {
         Schema::create('fis_articles', function (Blueprint $table) {
             $table->id();
-            
-            $table->unsignedBigInteger('fis_id');
-            $table->foreign('fis_id')->references('id')->on('users')->where('role', 'provider')->onDelete('cascade');
+
+            $table->unsignedBigInteger('fis_id')->nullable();
+            $table->foreign('fis_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
 
             $table->unsignedBigInteger('article_id');
             $table->foreign('article_id')->references('id')->on('articles')->onDelete('cascade');
+
+            $table->integer('price_bef')->nullable();
+            $table->integer('price_current')->nullable();
+
 
             $table->boolean('status')->default(true);
             $table->timestamps();

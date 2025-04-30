@@ -36,6 +36,9 @@ export default function Articles() {
 
     const [selectedCategory, setSelectedCategory] = useState("");
 
+    const [filterText, setFilterText] = useState("");
+    const [filterCategoryId, setFilterCategoryId] = useState("");
+
     const [article, setArticle] = useState({});
 
 
@@ -461,18 +464,25 @@ export default function Articles() {
 
 
                     <div className="flex justify-between items-center w-full mb-4 p-4">
-                        <div>
-                            <select
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
-                                className="border p-2 rounded-md"
-                            >
-                                <option className='bg-black text-gray dark:bg-white dark:text-black' value="">Toutes les catégories</option>
-                                {categories.map(cat => (
-                                    <option className='bg-black text-white dark:bg-white dark:text-black' key={cat.id} value={cat.id}>{cat.intitule}</option>
-                                ))}
-                            </select>
-                        </div>
+
+                        <input
+                            list="categories"
+                            value={filterText}
+                            onChange={e => {
+                                const text = e.target.value;
+                                setFilterText(text);
+                                const cat = categories.find(c => c.intitule === text);
+                                setFilterCategoryId(cat ? String(cat.id) : "");
+                            }}
+                            placeholder="Toutes les catégories"
+                            className="border p-2 rounded-md"
+                        />
+                        <datalist id="categories">
+                            {categories.map(cat => (
+                                <option key={cat.id} value={cat.intitule} />
+                            ))}
+                        </datalist>
+
 
                         <div className="flex gap-2">
                             {selected.length > 0 && (
@@ -513,8 +523,10 @@ export default function Articles() {
                                 </thead>
                                 <tbody>
                                     {articles
-                                        .filter((article) =>
-                                            selectedCategory === "" ? true : String(article.family_id) === selectedCategory
+                                        .filter(article =>
+                                            filterCategoryId === ""
+                                                ? true
+                                                : String(article.cat_family_id) === filterCategoryId
                                         )
                                         .map((product) => {
                                             const isItemSelected = isSelected(product.id);
