@@ -12,7 +12,6 @@ createServer((page) =>
         render: ReactDOMServer.renderToString,
         title: (title) => `${title} - ${appName}`,
 
-        // 👇 Changed .tsx to .jsx
         resolve: (name) =>
             resolvePageComponent(`./pages/${name}.jsx`, import.meta.glob('./pages/**/*.jsx')),
 
