@@ -2,9 +2,11 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
+import { type PropsWithChildren } from 'react';
 
-const sidebarNavItems  = [
+const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
         href: '/settings/profile',
@@ -22,7 +24,7 @@ const sidebarNavItems  = [
     },
 ];
 
-export default function SettingsLayout({ children }) {
+export default function SettingsLayout({ children }: PropsWithChildren) {
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
         return null;

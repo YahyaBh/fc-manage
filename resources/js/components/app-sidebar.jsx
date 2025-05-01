@@ -2,11 +2,12 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Phone, LayoutGrid, DatabaseIcon, FileText, Box, Layers, Compass, Handshake } from 'lucide-react';
 import AppLogo from './app-logo.jsx';
 
-const mainNavItems = [
+const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
@@ -60,7 +61,7 @@ const mainNavItems = [
     },
 ];
 
-const footerNavItems= [
+const footerNavItems: NavItem[] = [
     {
         title: 'Contact',
         href: 'tel:+212665665655',

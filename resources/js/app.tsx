@@ -9,7 +9,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 
 
-const appName = import.meta.env.VITE_APP_NAME || 'FC Manage';
+const appName = import.meta.env.VITE_APP_NAME || 'Application';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
